@@ -152,39 +152,39 @@
     <canvas id="particles-canvas" aria-hidden="true"></canvas>
 
     <!-- Controles de navegación y audio -->
-    <button id="back-btn" onclick="goBack()" class="fixed top-4 left-4 z-50 p-3 glass-panel rounded-full text-white hover:bg-white/10 transition-all hidden">
-        <i class="ph ph-arrow-left text-xl"></i>
+    <button id="back-btn" onclick="goBack()" class="fixed top-4 left-4 z-50 p-3.5 glass-panel rounded-full text-white hover:bg-white/10 transition-all hidden" title="Atrás">
+        <i class="ph ph-arrow-left text-2xl"></i>
     </button>
 
-    <button id="audio-toggle" class="fixed top-4 right-4 z-50 p-3 glass-panel rounded-full text-white hover:bg-white/10 transition-all hidden">
-        <i class="ph ph-speaker-slash text-xl opacity-50" id="audio-icon"></i>
+    <button id="audio-toggle" class="fixed top-4 right-4 z-50 p-3.5 glass-panel rounded-full text-white hover:bg-white/10 transition-all hidden" title="Música">
+        <i class="ph ph-speaker-slash text-2xl opacity-50" id="audio-icon"></i>
     </button>
     <audio id="bg-music" loop preload="auto">
         <source src="amor eterno.mp3" type="audio/mpeg">
     </audio>
 
     <div id="quick-nav" class="fixed bottom-4 left-1/2 -translate-x-1/2 z-50 hidden transition-all duration-300">
-        <div class="glass-panel px-3 py-2 rounded-full border border-gold-500/30 flex items-center gap-1 sm:gap-2 shadow-2xl backdrop-blur-md bg-black/80">
-            <button onclick="nextScreen(2)" title="Invitación" class="p-2.5 hover:bg-white/10 rounded-full text-gold-500 hover:scale-110 transition-all flex items-center justify-center">
-                <i class="ph ph-envelope-simple text-lg"></i>
+        <div class="glass-panel px-3.5 py-2.5 rounded-full border border-gold-500/30 flex items-center gap-1.5 sm:gap-2.5 shadow-2xl backdrop-blur-md bg-black/80">
+            <button onclick="nextScreen(2)" title="Invitación" class="p-2 sm:p-2.5 hover:bg-white/10 rounded-full text-gold-500 hover:scale-110 transition-all flex items-center justify-center">
+                <i class="ph ph-envelope-simple text-2xl"></i>
             </button>
-            <button onclick="nextScreen(3)" title="Trivia" class="p-2.5 hover:bg-white/10 rounded-full text-gold-500 hover:scale-110 transition-all flex items-center justify-center">
-                <i class="ph ph-game-controller text-lg"></i>
+            <button onclick="nextScreen(3)" title="Trivia" class="p-2 sm:p-2.5 hover:bg-white/10 rounded-full text-gold-500 hover:scale-110 transition-all flex items-center justify-center">
+                <i class="ph ph-game-controller text-2xl"></i>
             </button>
-            <button onclick="nextScreen(4)" title="Detalles del Evento" class="p-2.5 hover:bg-white/10 rounded-full text-gold-500 hover:scale-110 transition-all flex items-center justify-center">
-                <i class="ph ph-calendar-blank text-lg"></i>
+            <button onclick="nextScreen(4)" title="Detalles del Evento" class="p-2 sm:p-2.5 hover:bg-white/10 rounded-full text-gold-500 hover:scale-110 transition-all flex items-center justify-center">
+                <i class="ph ph-calendar-blank text-2xl"></i>
             </button>
-            <button onclick="nextScreen(5)" title="Confirmación (RSVP)" class="p-2.5 hover:bg-white/10 rounded-full text-gold-500 hover:scale-110 transition-all flex items-center justify-center">
-                <i class="ph ph-check-circle text-lg"></i>
+            <button onclick="nextScreen(5)" title="Confirmación (RSVP)" class="p-2 sm:p-2.5 hover:bg-white/10 rounded-full text-gold-500 hover:scale-110 transition-all flex items-center justify-center">
+                <i class="ph ph-check-circle text-2xl"></i>
             </button>
-            <button onclick="nextScreen(6)" title="Mensaje" class="p-2.5 hover:bg-white/10 rounded-full text-gold-500 hover:scale-110 transition-all flex items-center justify-center">
-                <i class="ph ph-chat-teardrop-text text-lg"></i>
+            <button onclick="nextScreen(6)" title="Mensaje" class="p-2 sm:p-2.5 hover:bg-white/10 rounded-full text-gold-500 hover:scale-110 transition-all flex items-center justify-center">
+                <i class="ph ph-chat-teardrop-text text-2xl"></i>
             </button>
-            <button onclick="nextScreen(8)" title="Comunidad y Galería" class="p-2.5 hover:bg-white/10 rounded-full text-gold-500 hover:scale-110 transition-all flex items-center justify-center">
-                <i class="ph ph-users-three text-lg"></i>
+            <button onclick="nextScreen(8)" title="Comunidad y Galería" class="p-2 sm:p-2.5 hover:bg-white/10 rounded-full text-gold-500 hover:scale-110 transition-all flex items-center justify-center">
+                <i class="ph ph-users-three text-2xl"></i>
             </button>
-            <button onclick="nextScreen(7)" title="Álbum de Fotos" class="p-2.5 bg-gradient-to-r from-gold-600 to-gold-400 text-black rounded-full font-bold hover:scale-105 transition-all flex items-center gap-1 px-3 text-xs">
-                <i class="ph ph-camera text-sm"></i>
+            <button onclick="nextScreen(7)" title="Álbum de Fotos" class="p-2 sm:p-2.5 bg-gradient-to-r from-gold-600 to-gold-400 text-black rounded-full font-bold hover:scale-105 transition-all flex items-center gap-1.5 px-3.5 text-xs">
+                <i class="ph ph-camera text-xl"></i>
                 <span class="hidden sm:inline">Subir Fotos</span>
             </button>
         </div>
@@ -302,14 +302,14 @@
                     <div class="p-3 bg-black/50 rounded-lg text-gold-500 text-xl"><i class="ph ph-clock"></i></div>
                     <div>
                         <p class="text-xs text-gray-400 uppercase tracking-wider">Hora</p>
-                        <p class="text-white font-medium" id="info-time">4:00 PM</p>
+                        <p class="text-white font-medium" id="info-time">3:00 PM</p>
                     </div>
                 </div>
                 <div class="flex items-center gap-4 glass-panel p-4 rounded-xl">
                     <div class="p-3 bg-black/50 rounded-lg text-gold-500 text-xl"><i class="ph ph-map-pin"></i></div>
                     <div>
                         <p class="text-xs text-gray-400 uppercase tracking-wider">Lugar</p>
-                        <p class="text-white font-medium" id="info-location">Don Angel y Delfa</p>
+                        <p class="text-white font-medium" id="info-location">Casa del Sr Ángel y delfita</p>
                     </div>
                 </div>
             </div>
@@ -837,7 +837,7 @@
         window.initCountdown = () => {
             if (countdownInterval) clearInterval(countdownInterval);
 
-            const targetDate = new Date('2026-09-20T16:00:00').getTime();
+            const targetDate = new Date('2026-09-20T15:00:00').getTime();
 
             function updateTimer() {
                 const now = new Date().getTime();

@@ -688,6 +688,13 @@
         async function saveGuestToDB() {
             if (!window.guestData.name) return;
 
+            if (window.guestData.score === undefined || window.guestData.score === null) {
+                const savedScore = localStorage.getItem('danitza_saved_score');
+                if (savedScore !== null) {
+                    window.guestData.score = parseInt(savedScore, 10);
+                }
+            }
+
             try { localStorage.setItem('danitza_guest_cache', JSON.stringify(window.guestData)); } catch (e) { }
 
             const payload = {
@@ -732,6 +739,10 @@
                     window.guestData.score = (data.score === null) ? undefined : data.score;
                     window.guestData.message = data.message || '';
                     restored = true;
+                    if (data.score !== null && data.score !== undefined) {
+                        localStorage.setItem('danitza_trivia_completed', 'true');
+                        localStorage.setItem('danitza_saved_score', data.score);
+                    }
                 }
             } catch (err) {
                 console.warn('No se pudo restaurar el estado desde el servidor, se usará la copia local.', err);
@@ -740,7 +751,13 @@
             if (!restored) {
                 try {
                     const cached = JSON.parse(localStorage.getItem('danitza_guest_cache') || 'null');
-                    if (cached) window.guestData = { ...window.guestData, ...cached, name: savedName };
+                    if (cached) {
+                        window.guestData = { ...window.guestData, ...cached, name: savedName };
+                        if (cached.score !== null && cached.score !== undefined) {
+                            localStorage.setItem('danitza_trivia_completed', 'true');
+                            localStorage.setItem('danitza_saved_score', cached.score);
+                        }
+                    }
                 } catch (e) { }
             }
 
@@ -767,6 +784,8 @@
             localStorage.removeItem('danitza_guest_name');
             localStorage.removeItem('danitza_device_id');
             localStorage.removeItem('danitza_guest_cache');
+            localStorage.removeItem('danitza_trivia_completed');
+            localStorage.removeItem('danitza_saved_score');
             window.guestData = { name: '', status: null, companions: 0, score: undefined, message: '' };
             document.getElementById('guest-name-input').value = '';
             document.getElementById('returning-guest-box').classList.add('hidden');
@@ -856,7 +875,48 @@
         let currentQuestionIndex = 0;
         let currentTriviaScore = 0;
 
+        function isTriviaCompleted() {
+            return (window.guestData.score !== undefined && window.guestData.score !== null)
+                || localStorage.getItem('danitza_trivia_completed') === 'true';
+        }
+
+        function showTriviaResult(score, alreadyCompleted = false) {
+            document.getElementById('trivia-container').classList.add('hidden');
+            const resultDiv = document.getElementById('trivia-result');
+            resultDiv.classList.remove('hidden');
+
+            document.getElementById('score-text').textContent = score;
+
+            let emoji = '🎯';
+            let msg = '¡Gracias por responder!';
+            if (score >= 8) {
+                emoji = '🏆';
+                msg = '¡Increíble! Conoces a Danitza súper bien.';
+            } else if (score >= 5) {
+                emoji = '👏';
+                msg = '¡Buen trabajo! Tienes un excelente cariño por Danitza.';
+            } else {
+                emoji = '😊';
+                msg = '¡No pasa nada! El día de la Celebración podrás conocerla mucho mejor.';
+            }
+
+            if (alreadyCompleted) {
+                msg += '<br><span class="inline-block mt-3 px-3 py-1 bg-gold-500/10 border border-gold-500/30 text-gold-400 text-xs rounded-full font-medium">✓ Ya respondiste esta encuesta (solo se permite 1 intento)</span>';
+            }
+
+            document.getElementById('score-emoji').textContent = emoji;
+            document.getElementById('score-msg').innerHTML = msg;
+        }
+
         window.startTrivia = () => {
+            if (isTriviaCompleted()) {
+                const savedScore = (window.guestData.score !== undefined && window.guestData.score !== null)
+                    ? window.guestData.score
+                    : parseInt(localStorage.getItem('danitza_saved_score') || '0', 10);
+                showTriviaResult(savedScore, true);
+                return;
+            }
+
             currentQuestionIndex = 0;
             currentTriviaScore = 0;
             document.getElementById('trivia-container').classList.remove('hidden');
@@ -865,6 +925,11 @@
         };
 
         function renderQuestion() {
+            if (isTriviaCompleted()) {
+                window.startTrivia();
+                return;
+            }
+
             const q = TRIVIA_QUESTIONS[currentQuestionIndex];
             document.getElementById('q-current').textContent = currentQuestionIndex + 1;
             document.getElementById('q-total').textContent = TRIVIA_QUESTIONS.length;
@@ -883,6 +948,8 @@
         }
 
         function selectOption(selectedIdx, btnElement) {
+            if (isTriviaCompleted()) return;
+
             const q = TRIVIA_QUESTIONS[currentQuestionIndex];
             const optsContainer = document.getElementById('options-container');
             const buttons = optsContainer.querySelectorAll('button');
@@ -913,29 +980,10 @@
         }
 
         function finishTrivia() {
-            document.getElementById('trivia-container').classList.add('hidden');
-            const resultDiv = document.getElementById('trivia-result');
-            resultDiv.classList.remove('hidden');
-
             window.guestData.score = currentTriviaScore;
-            document.getElementById('score-text').textContent = currentTriviaScore;
-
-            let emoji = '🎯';
-            let msg = '¡Gracias por jugar!';
-            if (currentTriviaScore >= 8) {
-                emoji = '🏆';
-                msg = '¡Increíble! Conoces a Danitza súper bien.';
-            } else if (currentTriviaScore >= 5) {
-                emoji = '👏';
-                msg = '¡Buen trabajo! Tienes un excelente cariño por Danitza.';
-            } else {
-                emoji = '😊';
-                msg = '¡No pasa nada! El día de la Celebración podrás conocerla mucho mejor.';
-            }
-
-            document.getElementById('score-emoji').textContent = emoji;
-            document.getElementById('score-msg').textContent = msg;
-
+            localStorage.setItem('danitza_trivia_completed', 'true');
+            localStorage.setItem('danitza_saved_score', currentTriviaScore);
+            showTriviaResult(currentTriviaScore, false);
             saveGuestToDB();
         }
 

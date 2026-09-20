@@ -4,13 +4,13 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Invitación - Cumpleaños de Danitza</title>
+    <title>¡Feliz Cumpleaños Danitza! 🎉 - Muro en Vivo & Fotos</title>
 
     <!-- Fuentes Google -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link
-        href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;700&family=Playfair+Display:ital,wght@0,400;0,700;1,400&display=swap"
+        href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Playfair+Display:ital,wght@0,400;0,700;1,400&display=swap"
         rel="stylesheet">
 
     <!-- Tailwind CSS (CDN) -->
@@ -71,6 +71,12 @@
             z-index: 10;
         }
 
+        #screen-0.screen {
+            justify-content: flex-start !important;
+            padding-top: 1.5rem !important;
+            padding-bottom: 7.5rem !important;
+        }
+
         .screen.active {
             display: flex;
             animation: fadeIn 0.7s ease-out forwards;
@@ -96,7 +102,7 @@
             }
 
             50% {
-                transform: translateY(-14px);
+                transform: translateY(-10px);
             }
         }
 
@@ -120,7 +126,11 @@
             animation: pulse-glow 2.4s infinite;
         }
 
-        /* Lienzo de partículas doradas ambientales (reemplaza el degradado estático) */
+        .break-inside-avoid {
+            break-inside: avoid;
+        }
+
+        /* Lienzo de partículas doradas ambientales */
         #particles-canvas {
             position: fixed;
             inset: 0;
@@ -146,25 +156,40 @@
         }
 
         .glass-panel {
-            background: linear-gradient(155deg, rgba(255, 255, 255, 0.05), rgba(255, 255, 255, 0.02));
+            background: linear-gradient(155deg, rgba(255, 255, 255, 0.06), rgba(255, 255, 255, 0.02));
             backdrop-filter: blur(14px);
-            border: 1px solid rgba(255, 255, 255, 0.09);
-            box-shadow: 0 1px 0 0 rgba(255, 255, 255, 0.05) inset, 0 8px 24px -12px rgba(0, 0, 0, 0.5);
+            -webkit-backdrop-filter: blur(14px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            box-shadow: 0 1px 0 0 rgba(255, 255, 255, 0.06) inset, 0 8px 24px -12px rgba(0, 0, 0, 0.5);
         }
 
         .photo-frame {
             border-radius: 22px;
-            box-shadow: 0 12px 36px -8px rgba(201, 153, 47, 0.35);
-            border: 2px solid rgba(222, 183, 83, 0.55);
+            box-shadow: 0 12px 36px -8px rgba(201, 153, 47, 0.45);
+            border: 2px solid rgba(222, 183, 83, 0.65);
         }
 
-        /* Tipografía fluida para el nombre principal */
         .hero-name {
             font-size: clamp(2.75rem, 9vw, 4.25rem);
             letter-spacing: -0.01em;
         }
 
-        /* Estados de foco visibles para accesibilidad */
+        /* Scrollbar suave */
+        ::-webkit-scrollbar {
+            width: 6px;
+            height: 6px;
+        }
+        ::-webkit-scrollbar-track {
+            background: rgba(0,0,0,0.4);
+        }
+        ::-webkit-scrollbar-thumb {
+            background: rgba(222, 183, 83, 0.3);
+            border-radius: 9999px;
+        }
+        ::-webkit-scrollbar-thumb:hover {
+            background: rgba(222, 183, 83, 0.6);
+        }
+
         button:focus-visible,
         input:focus-visible,
         textarea:focus-visible,
@@ -179,7 +204,6 @@
         }
 
         @media (prefers-reduced-motion: reduce) {
-
             .float-anim,
             .glow-btn,
             .screen.active {
@@ -198,86 +222,321 @@
     <div class="bg-particles"></div>
     <canvas id="particles-canvas" aria-hidden="true"></canvas>
 
-    <!-- Controles de navegación y audio -->
+    <!-- Input de archivo global accesible desde cualquier botón o pantalla -->
+    <input type="file" id="file-upload" accept="image/*" class="hidden" onchange="handleFileUpload(event)">
+
+    <!-- Notificación Toast Flotante -->
+    <div id="toast-notification"
+        class="fixed top-5 left-1/2 -translate-x-1/2 z-[110] px-5 py-3 rounded-full glass-panel border border-gold-500/50 text-white font-medium text-xs sm:text-sm shadow-2xl flex items-center gap-2 transform -translate-y-24 opacity-0 transition-all duration-300 pointer-events-none">
+        <span id="toast-icon">✨</span>
+        <span id="toast-text">Notificación</span>
+    </div>
+
+    <!-- Visor de Foto en Pantalla Completa (Lightbox) -->
+    <div id="photo-lightbox"
+        class="fixed inset-0 z-[100] bg-black/95 backdrop-blur-md hidden flex flex-col items-center justify-center p-4 transition-all"
+        onclick="if(event.target === this) closeLightbox()">
+        <button onclick="closeLightbox()"
+            class="absolute top-4 right-4 p-3 rounded-full glass-panel text-white hover:bg-white/20 text-2xl z-10"
+            title="Cerrar">
+            <i class="ph ph-x"></i>
+        </button>
+        <div class="max-w-3xl max-h-[85vh] flex flex-col items-center w-full">
+            <img id="lightbox-img" src="" alt="Foto en grande"
+                class="max-h-[75vh] max-w-full object-contain rounded-2xl shadow-[0_0_50px_rgba(0,0,0,0.9)] border border-gold-500/40 mb-3" />
+            <p id="lightbox-caption"
+                class="text-gold-300 font-medium text-xs sm:text-sm text-center px-4 py-1.5 glass-panel rounded-full border border-white/10"></p>
+        </div>
+    </div>
+
+    <!-- Modal Rápido para Dejar Mensaje -->
+    <div id="quick-msg-modal"
+        class="fixed inset-0 z-[90] bg-black/85 backdrop-blur-md hidden flex items-center justify-center p-4 transition-all"
+        onclick="if(event.target === this) closeQuickMsgModal()">
+        <div
+            class="glass-panel p-6 sm:p-8 rounded-3xl max-w-md w-full border border-gold-500/40 relative shadow-[0_0_50px_rgba(201,153,47,0.3)]">
+            <button onclick="closeQuickMsgModal()"
+                class="absolute top-4 right-4 p-2 rounded-full glass-panel text-gray-400 hover:text-white">
+                <i class="ph ph-x text-lg"></i>
+            </button>
+            <div class="text-center mb-5">
+                <span class="text-3xl mb-1 inline-block">💌</span>
+                <h3 class="text-2xl font-serif text-white">Dedicar un Mensaje</h3>
+                <p class="text-xs text-gray-400">Danitza lo leerá hoy en su fiesta</p>
+            </div>
+            <div class="space-y-3 mb-5">
+                <div>
+                    <label class="block text-xs text-gray-400 mb-1">Tu nombre y apellido:</label>
+                    <input type="text" id="modal-msg-name" placeholder="Escribe tu nombre aquí..."
+                        class="w-full px-4 py-2.5 rounded-xl bg-black/50 border border-white/20 focus:border-gold-400 text-white text-sm focus:outline-none" />
+                </div>
+                <div>
+                    <label class="block text-xs text-gray-400 mb-1">Tu mensaje o felicitación:</label>
+                    <textarea id="modal-msg-text" placeholder="Escribe tus palabras de bendición y cariño para Danitza..."
+                        class="w-full h-28 p-3.5 rounded-xl bg-black/50 border border-white/20 focus:border-gold-400 text-white text-sm focus:outline-none resize-none"></textarea>
+                </div>
+            </div>
+            <button onclick="submitModalMessage()"
+                class="w-full py-3.5 bg-gradient-to-r from-gold-600 to-gold-400 text-black font-bold rounded-xl text-sm hover:scale-105 transition-all shadow-lg flex items-center justify-center gap-2">
+                <i class="ph ph-heart-fill text-red-500"></i> Publicar en el Muro
+            </button>
+        </div>
+    </div>
+
+    <!-- Modal Rápido de Identificación de Nombre -->
+    <div id="name-prompt-modal"
+        class="fixed inset-0 z-[95] bg-black/85 backdrop-blur-md hidden flex items-center justify-center p-4 transition-all"
+        onclick="if(event.target === this) closeNamePrompt()">
+        <div class="glass-panel p-6 rounded-2xl max-w-xs w-full border border-gold-500/40 text-center relative shadow-2xl">
+            <button onclick="closeNamePrompt()"
+                class="absolute top-3 right-3 p-1.5 rounded-full glass-panel text-gray-400 hover:text-white">
+                <i class="ph ph-x text-sm"></i>
+            </button>
+            <span class="text-3xl mb-2 inline-block">👋</span>
+            <h3 class="text-xl font-serif text-white mb-1">¿Cómo te llamas?</h3>
+            <p class="text-xs text-gray-400 mb-4">Para que Danitza y los invitados sepan quién sube la foto o el mensaje</p>
+            <input type="text" id="quick-name-input" placeholder="Tu nombre y apellido"
+                class="w-full px-4 py-2.5 rounded-xl bg-black/50 text-white text-center focus:outline-none border border-gold-500/40 mb-4 text-sm" />
+            <div class="flex gap-2">
+                <button onclick="saveQuickName(true)"
+                    class="flex-1 py-2.5 bg-gradient-to-r from-gold-600 to-gold-400 text-black font-bold rounded-xl text-xs hover:scale-105 transition-all shadow-md">Guardar</button>
+                <button onclick="saveQuickName(false)"
+                    class="px-4 py-2.5 glass-panel text-gray-400 hover:text-white rounded-xl text-xs">Omitir</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Controles flotantes superiores: Volver y Música -->
     <button id="back-btn" onclick="goBack()"
         class="fixed top-4 left-4 z-50 p-3.5 glass-panel rounded-full text-white hover:bg-white/10 transition-all hidden"
-        title="Atrás">
+        title="Volver al Inicio">
         <i class="ph ph-arrow-left text-2xl"></i>
     </button>
 
     <button id="audio-toggle"
-        class="fixed top-4 right-4 z-50 p-3.5 glass-panel rounded-full text-white hover:bg-white/10 transition-all hidden"
-        title="Música">
+        class="fixed top-4 right-4 z-50 p-3.5 glass-panel rounded-full text-white hover:bg-white/10 transition-all shadow-lg"
+        title="Música de la Fiesta">
         <i class="ph ph-speaker-slash text-2xl opacity-50" id="audio-icon"></i>
     </button>
     <audio id="bg-music" loop preload="auto">
         <source src="amor eterno.mp3" type="audio/mpeg">
     </audio>
 
-    <div id="quick-nav" class="fixed bottom-4 left-1/2 -translate-x-1/2 z-50 hidden transition-all duration-300">
+    <!-- Barra de Navegación Rápida Flotante -->
+    <div id="quick-nav" class="fixed bottom-4 left-1/2 -translate-x-1/2 z-50 transition-all duration-300">
         <div
-            class="glass-panel px-3.5 py-2.5 rounded-full border border-gold-500/30 flex items-center gap-1.5 sm:gap-2.5 shadow-2xl backdrop-blur-md bg-black/80">
-            <button onclick="nextScreen(2)" title="Invitación"
-                class="p-2 sm:p-2.5 hover:bg-white/10 rounded-full text-gold-500 hover:scale-110 transition-all flex items-center justify-center">
-                <i class="ph ph-envelope-simple text-2xl"></i>
+            class="glass-panel px-3.5 py-2.5 rounded-full border border-gold-500/30 flex items-center gap-2 sm:gap-3 shadow-2xl backdrop-blur-md bg-black/85">
+            <button onclick="nextScreen(0)" title="Mural de la Fiesta"
+                class="p-2 sm:p-2.5 hover:bg-white/10 rounded-full text-gold-400 hover:scale-110 transition-all flex items-center justify-center">
+                <i class="ph ph-house-line text-2xl"></i>
             </button>
-            <button onclick="nextScreen(3)" title="Trivia"
+            <button onclick="triggerPhotoUpload()" title="Subir Foto al Mural"
+                class="p-2 sm:p-2.5 bg-gradient-to-r from-gold-600 to-gold-400 text-black rounded-full font-bold hover:scale-110 transition-all flex items-center gap-1.5 px-3 text-xs shadow-lg">
+                <i class="ph ph-camera text-xl"></i>
+                <span class="hidden sm:inline">Subir Foto</span>
+            </button>
+            <button onclick="openQuickMsgModal()" title="Dedicar Mensaje"
+                class="p-2 sm:p-2.5 hover:bg-white/10 rounded-full text-red-400 hover:scale-110 transition-all flex items-center justify-center">
+                <i class="ph ph-chat-teardrop-heart text-2xl"></i>
+            </button>
+            <button onclick="nextScreen(4)" title="Detalles y Ubicación"
+                class="p-2 sm:p-2.5 hover:bg-white/10 rounded-full text-gold-500 hover:scale-110 transition-all flex items-center justify-center">
+                <i class="ph ph-map-pin text-2xl"></i>
+            </button>
+            <button onclick="nextScreen(3)" title="Trivia de Danitza"
                 class="p-2 sm:p-2.5 hover:bg-white/10 rounded-full text-gold-500 hover:scale-110 transition-all flex items-center justify-center">
                 <i class="ph ph-game-controller text-2xl"></i>
             </button>
-            <button onclick="nextScreen(4)" title="Detalles del Evento"
+            <button onclick="nextScreen(2)" title="Invitación Formal"
                 class="p-2 sm:p-2.5 hover:bg-white/10 rounded-full text-gold-500 hover:scale-110 transition-all flex items-center justify-center">
-                <i class="ph ph-calendar-blank text-2xl"></i>
-            </button>
-            <button onclick="nextScreen(5)" title="Confirmación (RSVP)"
-                class="p-2 sm:p-2.5 hover:bg-white/10 rounded-full text-gold-500 hover:scale-110 transition-all flex items-center justify-center">
-                <i class="ph ph-check-circle text-2xl"></i>
-            </button>
-            <button onclick="nextScreen(6)" title="Mensaje"
-                class="p-2 sm:p-2.5 hover:bg-white/10 rounded-full text-gold-500 hover:scale-110 transition-all flex items-center justify-center">
-                <i class="ph ph-chat-teardrop-text text-2xl"></i>
-            </button>
-            <button onclick="nextScreen(8)" title="Comunidad y Galería"
-                class="p-2 sm:p-2.5 hover:bg-white/10 rounded-full text-gold-500 hover:scale-110 transition-all flex items-center justify-center">
-                <i class="ph ph-users-three text-2xl"></i>
-            </button>
-            <button onclick="nextScreen(7)" title="Álbum de Fotos"
-                class="p-2 sm:p-2.5 bg-gradient-to-r from-gold-600 to-gold-400 text-black rounded-full font-bold hover:scale-105 transition-all flex items-center gap-1.5 px-3.5 text-xs">
-                <i class="ph ph-camera text-xl"></i>
-                <span class="hidden sm:inline">Subir Fotos</span>
+                <i class="ph ph-envelope-simple text-2xl"></i>
             </button>
         </div>
     </div>
 
-    <div id="screen-0" class="screen active text-center">
-        <h1 class="text-4xl font-serif text-white mb-2">¡Hola!</h1>
-        <p class="text-gray-300 text-lg mb-8 font-light">Para comenzar, dinos tu nombre y apellido:</p>
+    <!-- PANTALLA PRINCIPAL: MODO FIESTA EN VIVO (SCREEN 0) -->
+    <div id="screen-0" class="screen active text-center w-full max-w-4xl mx-auto px-3 sm:px-6">
+        <!-- Barra de Estado de la Fiesta -->
+        <div class="w-full flex items-center justify-between gap-2 mb-6 pt-1">
+            <div class="flex items-center gap-2">
+                <span
+                    class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-bold bg-gold-500/20 text-gold-300 border border-gold-500/40 shadow-sm animate-pulse">
+                    <span class="w-2 h-2 rounded-full bg-emerald-400 inline-block animate-ping"></span>
+                    🎉 ¡FIESTA EN VIVO!
+                </span>
+<span id="server-status-badge-hub"
+                        class="hidden sm:inline-flex px-2.5 py-0.5 rounded-full text-[10px] font-medium bg-emerald-500/20 text-emerald-300 border border-emerald-500/30">
+                        ☁️ Conectado en tiempo real
+                    </span>
+            </div>
 
-        <input type="text" id="guest-name-input"
-            class="w-full max-w-xs px-4 py-3 rounded-xl glass-panel text-white text-center focus:outline-none border-white/20 focus:border-gold-500 transition-colors mb-8"
-            placeholder="Escribe tu nombre y apellido aquí...">
-
-        <button onclick="registerName()"
-            class="px-8 py-3 bg-gradient-to-r from-gold-600 to-gold-400 rounded-full text-black font-bold tracking-widest glow-btn hover:scale-105 transition-transform flex items-center gap-2 mx-auto disabled:opacity-50"
-            id="btn-enter">
-            CONTINUAR <i class="ph ph-caret-right"></i>
-        </button>
-
-        <div id="returning-guest-box"
-            class="hidden mt-8 p-4 rounded-xl glass-panel max-w-xs mx-auto border border-gold-500/30">
-            <p class="text-xs text-gold-500 uppercase font-bold mb-1">¡Ya estás registrado!</p>
-            <p id="returning-guest-name" class="text-white font-medium text-sm mb-3"></p>
-            <div class="flex gap-2 justify-center">
-                <button onclick="continueAsReturningGuest()"
-                    class="px-4 py-2 bg-gold-500 text-black text-xs font-bold rounded-lg hover:bg-gold-400 transition-all flex items-center gap-1">
-                    <i class="ph ph-user-check"></i> Entrar como <span id="btn-returning-short"></span>
-                </button>
-                <button onclick="resetGuestSession()"
-                    class="px-3 py-2 glass-panel text-gray-400 text-xs rounded-lg hover:text-white transition-all">Cambiar</button>
+            <!-- Identidad del Invitado -->
+            <div class="flex items-center gap-2">
+                <div id="hub-user-badge" onclick="openNamePrompt()"
+                    class="cursor-pointer px-3.5 py-1.5 glass-panel rounded-full text-xs text-gray-300 hover:text-gold-300 border border-white/15 hover:border-gold-500/50 flex items-center gap-1.5 transition-all shadow-sm">
+                    <i class="ph ph-user text-gold-400 text-sm"></i>
+                    <span id="hub-user-name" class="max-w-[120px] truncate font-medium">Invitado</span>
+                    <i class="ph ph-pencil-simple text-[10px] text-gray-400"></i>
+                </div>
             </div>
         </div>
 
-        <p id="name-error" class="text-red-400 text-sm mt-4 hidden">Por favor, ingresa tu nombre y apellido.</p>
+        <!-- Hero Especial para la Cumpleañera Danitza -->
+        <div class="w-full text-center relative mb-8">
+            <div class="relative inline-block mx-auto mb-4">
+                <div
+                    class="absolute -inset-2 rounded-full bg-gradient-to-r from-gold-400 via-amber-300 to-gold-600 opacity-70 blur-md animate-pulse">
+                </div>
+                <img src="dani_40.jpeg" alt="Danitza"
+                    onerror="this.src='https://placehold.co/400x400/1a1a1a/F59E0B?text=Danitza'"
+                    class="relative w-36 h-36 sm:w-48 sm:h-48 object-cover object-top rounded-full border-2 border-gold-300 shadow-[0_0_40px_rgba(201,153,47,0.5)] photo-frame float-anim" />
+                <span
+                    class="absolute -bottom-2 right-1/2 translate-x-1/2 px-3.5 py-1 bg-gradient-to-r from-gold-600 via-gold-500 to-gold-400 text-black text-[11px] font-black rounded-full uppercase tracking-wider shadow-xl whitespace-nowrap border border-gold-200">
+                    👑 ¡40 Primaveras!
+                </span>
+            </div>
+
+            <p class="text-gold-400 tracking-widest text-xs sm:text-sm font-semibold uppercase mb-1">
+                ¡HOY ES EL GRAN DÍA!
+            </p>
+            <h1 class="hero-name font-serif text-white font-bold tracking-tight mb-2">
+                ¡Feliz Cumpleaños, <span
+                    class="bg-gradient-to-r from-gold-300 via-gold-400 to-amber-200 bg-clip-text text-transparent">Danitza!</span>
+            </h1>
+            <p class="text-gold-400/90 font-serif italic text-lg sm:text-xl mb-3">
+                "Hoy celebramos tu vida, tu alegría y cada bendición"
+            </p>
+            <p class="text-gray-300 text-sm max-w-lg mx-auto font-light leading-relaxed mb-6 px-2">
+                ¡La fiesta ha comenzado! Danitza y todos los invitados están compartiendo este mural en vivo. Sube tus fotos del momento y dedícale tus mejores palabras.
+            </p>
+
+            <!-- Botones Principales de Acción Rápida (Súper Visibles) -->
+            <div class="grid grid-cols-1 sm:grid-cols-2 gap-3.5 max-w-lg mx-auto w-full px-2 mb-6">
+                <!-- Botón 1: Subir Foto Directa -->
+                <button onclick="triggerPhotoUpload()" id="hub-upload-btn"
+                    class="w-full p-4 sm:p-5 bg-gradient-to-r from-gold-500 via-amber-400 to-gold-600 text-black rounded-2xl font-black text-base flex items-center justify-center gap-3 shadow-[0_0_30px_rgba(222,183,83,0.45)] hover:scale-[1.03] active:scale-[0.98] transition-all group"
+                    data-original-html="<div class=\"w-11 h-11 rounded-full bg-black/15 flex items-center justify-center text-black text-2xl group-hover:rotate-12 transition-transform\"><i class=\"ph ph-camera-plus\"></i></div><div class=\"text-left\"><span class=\"block text-sm sm:text-base font-black tracking-wide leading-tight\">SUBIR FOTO AL MURAL</span><span class=\"block text-[11px] font-medium opacity-85 leading-tight\">Toma foto o sube de galería</span></div>">
+                    <div
+                        class="w-11 h-11 rounded-full bg-black/15 flex items-center justify-center text-black text-2xl group-hover:rotate-12 transition-transform">
+                        <i class="ph ph-camera-plus"></i>
+                    </div>
+                    <div class="text-left">
+                        <span class="block text-sm sm:text-base font-black tracking-wide leading-tight">SUBIR FOTO AL MURAL</span>
+                        <span class="block text-[11px] font-medium opacity-85 leading-tight">Toma foto o sube de galería</span>
+                    </div>
+                </button>
+
+                <!-- Botón 2: Escribir Dedicatoria -->
+                <button onclick="openQuickMsgModal()"
+                    class="w-full p-4 sm:p-5 glass-panel border-2 border-gold-400/50 hover:border-gold-400 text-white rounded-2xl font-black text-base flex items-center justify-center gap-3 shadow-[0_0_20px_rgba(0,0,0,0.5)] hover:bg-white/10 hover:scale-[1.03] active:scale-[0.98] transition-all group">
+                    <div
+                        class="w-11 h-11 rounded-full bg-gold-500/20 flex items-center justify-center text-red-400 text-2xl group-hover:scale-110 transition-transform">
+                        <i class="ph ph-heart-fill"></i>
+                    </div>
+                    <div class="text-left">
+                        <span class="block text-sm sm:text-base font-black text-gold-300 tracking-wide leading-tight">DEDICAR MENSAJE</span>
+                        <span class="block text-[11px] text-gray-300 font-medium leading-tight">Escríbele tus buenos deseos</span>
+                    </div>
+                </button>
+            </div>
+
+            <!-- Accesos rápidos secundarios: Ubicación, Trivia, Invitación -->
+            <div class="flex flex-wrap items-center justify-center gap-2 mb-8 text-xs">
+                <a href="https://maps.app.goo.gl/9vkM2YbcgbE6CUdc9" target="_blank"
+                    class="px-3.5 py-2 glass-panel rounded-full text-gray-300 hover:text-gold-300 hover:border-gold-500/40 transition-all flex items-center gap-1.5 border border-white/10 shadow-sm">
+                    <i class="ph ph-map-pin text-gold-400 text-sm"></i>
+                    <span>Casa Ángel y Delfita (3:00 PM)</span>
+                    <i class="ph ph-arrow-up-right text-[10px] opacity-70"></i>
+                </a>
+                <button onclick="nextScreen(3)"
+                    class="px-3.5 py-2 glass-panel rounded-full text-gray-300 hover:text-gold-300 hover:border-gold-500/40 transition-all flex items-center gap-1.5 border border-white/10 shadow-sm">
+                    <i class="ph ph-game-controller text-gold-400 text-sm"></i>
+                    <span>Jugar Trivia</span>
+                </button>
+                <button onclick="nextScreen(2)"
+                    class="px-3.5 py-2 glass-panel rounded-full text-gray-300 hover:text-gold-300 hover:border-gold-500/40 transition-all flex items-center gap-1.5 border border-white/10 shadow-sm">
+                    <i class="ph ph-envelope text-gold-400 text-sm"></i>
+                    <span>Ver Invitación Original</span>
+                </button>
+            </div>
+        </div>
+
+        <!-- Feed en Vivo: Tabs de Fotos y Mensajes -->
+        <div class="w-full text-left">
+            <!-- Selector de Pestañas -->
+            <div class="flex items-center justify-center gap-2 mb-6 border-b border-white/10 pb-3 max-w-md mx-auto">
+                <button onclick="switchHubTab('tab-hub-photos')" id="btn-tab-hub-photos"
+                    class="hub-tab-btn flex-1 py-2.5 px-3 rounded-xl font-bold text-xs sm:text-sm bg-gradient-to-r from-gold-600 to-gold-400 text-black shadow-lg transition-all flex items-center justify-center gap-1.5">
+                    <i class="ph ph-images text-base"></i>
+                    <span>Mural de Fotos</span>
+                    <span id="hub-photos-count"
+                        class="ml-1 px-2 py-0.5 bg-black/25 rounded-full text-[10px] font-black">0</span>
+                </button>
+
+                <button onclick="switchHubTab('tab-hub-messages')" id="btn-tab-hub-messages"
+                    class="hub-tab-btn flex-1 py-2.5 px-3 rounded-xl font-bold text-xs sm:text-sm glass-panel text-gray-300 border border-white/10 hover:text-white transition-all flex items-center justify-center gap-1.5">
+                    <i class="ph ph-chat-teardrop-heart text-base text-red-400"></i>
+                    <span>Mensajes para Danitza</span>
+                    <span id="hub-messages-count"
+                        class="ml-1 px-2 py-0.5 bg-white/10 rounded-full text-[10px] font-black">0</span>
+                </button>
+            </div>
+
+            <!-- Tab 1: Fotos en Vivo -->
+            <div id="tab-hub-photos" class="hub-tab-content">
+                <!-- Tarjeta de subida rápida dentro del feed -->
+                <div onclick="triggerPhotoUpload()"
+                    class="cursor-pointer w-full p-4 mb-6 rounded-2xl border-2 border-dashed border-gold-500/40 hover:border-gold-400 glass-panel flex items-center justify-between gap-4 transition-all hover:bg-gold-500/5 group shadow-md">
+                    <div class="flex items-center gap-3">
+                        <div
+                            class="w-10 h-10 rounded-xl bg-gold-500/20 text-gold-400 flex items-center justify-center text-xl group-hover:scale-110 transition-transform">
+                            <i class="ph ph-camera"></i>
+                        </div>
+                        <div>
+                            <p class="text-sm font-bold text-white group-hover:text-gold-300 transition-colors">¿Tomaste una foto en la fiesta?</p>
+                            <p class="text-xs text-gray-400">Toca aquí para sumarla al mural en tiempo real</p>
+                        </div>
+                    </div>
+                    <span
+                        class="px-3.5 py-1.5 bg-gold-500 text-black text-xs font-bold rounded-xl shadow-md whitespace-nowrap group-hover:bg-gold-400 flex items-center gap-1">
+                        <i class="ph ph-plus-bold"></i> Subir
+                    </span>
+                </div>
+
+                <!-- Grid de Fotos Masonry -->
+                <div id="hub-photo-grid" class="w-full columns-2 md:columns-3 gap-3.5 space-y-3.5">
+                    <p class="text-gray-500 italic text-center py-12 col-span-full">Cargando fotos del mural...</p>
+                </div>
+            </div>
+
+            <!-- Tab 2: Mensajes para Danitza -->
+            <div id="tab-hub-messages" class="hub-tab-content hidden">
+                <!-- Caja para escribir dedicatoria directa sin modal -->
+                <div class="w-full max-w-2xl mx-auto mb-6 p-5 glass-panel rounded-2xl border border-gold-500/30 shadow-xl">
+                    <h3 class="text-sm font-bold text-gold-300 mb-2 flex items-center gap-1.5">
+                        <i class="ph ph-pencil-line text-base text-gold-400"></i> Escribe tu dedicatoria para Danitza:
+                    </h3>
+                    <textarea id="hub-inline-message" placeholder="Escribe aquí tus felicitaciones, bendiciones y palabras para la cumpleañera..."
+                        class="w-full h-24 p-3.5 rounded-xl bg-black/50 border border-white/15 focus:border-gold-400 text-white text-sm focus:outline-none resize-none mb-3"></textarea>
+                    <div class="flex flex-col sm:flex-row items-center justify-between gap-3">
+                        <p class="text-xs text-gray-400 flex items-center gap-1.5">
+                            <i class="ph ph-user text-gold-400"></i> Firmado como: <span id="hub-inline-author"
+                                class="text-gold-300 font-bold cursor-pointer underline hover:text-white"
+                                onclick="openNamePrompt()">Invitado</span>
+                        </p>
+                        <button onclick="submitInlineMessage()"
+                            class="w-full sm:w-auto px-6 py-2.5 bg-gradient-to-r from-gold-600 to-gold-400 text-black font-bold text-xs rounded-xl hover:scale-105 transition-all flex items-center justify-center gap-1.5 shadow-md">
+                            <i class="ph ph-paper-plane-tilt"></i> Publicar Mensaje
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Listado de Mensajes -->
+                <div id="hub-messages-list" class="grid grid-cols-1 md:grid-cols-2 gap-4 max-w-3xl mx-auto">
+                    <p class="text-gray-500 italic text-center py-12 col-span-2">Cargando felicitaciones para Danitza...</p>
+                </div>
+            </div>
+        </div>
     </div>
 
     <div id="screen-1" class="screen text-center">
@@ -471,9 +730,9 @@
 
         <div id="msg-success" class="hidden text-center text-gold-500 text-2xl font-serif">
             <p class="mb-4">¡Tu mensaje quedó guardado! ❤️</p>
-            <button onclick="nextScreen(8)"
+            <button onclick="nextScreen(0)"
                 class="px-6 py-3 bg-gradient-to-r from-gold-600 to-gold-400 text-black font-bold rounded-full text-sm hover:scale-105 transition-all shadow-lg flex items-center gap-2 mx-auto">
-                <i class="ph ph-quotes text-lg"></i> VER MURO Y GALERÍA
+                <i class="ph ph-sparkle text-lg"></i> VER MURAL DE LA FIESTA
             </button>
         </div>
     </div>
@@ -485,9 +744,7 @@
             <p class="text-sm text-gray-400 mb-8 text-center max-w-sm">Sube una foto que tengas con Danitza y luego
                 comparte fotos del evento. ¡Todos los invitados podrán verlas!</p>
 
-            <input type="file" id="file-upload" accept="image/*" class="hidden" onchange="handleFileUpload(event)">
-
-            <button onclick="document.getElementById('file-upload').click()" id="upload-btn"
+            <button onclick="triggerPhotoUpload()" id="upload-btn"
                 class="mb-10 px-8 py-4 bg-gradient-to-r from-gold-600 to-gold-400 text-black rounded-full font-bold flex items-center gap-2 hover:scale-105 transition-transform shadow-[0_0_20px_rgba(245,158,11,0.3)]">
                 <i class="ph ph-camera-plus text-xl"></i> SUBIR UNA FOTO
             </button>
@@ -515,7 +772,7 @@
                 <div>
                     <h2 class="text-2xl md:text-3xl font-serif text-gold-500">Comunidad & Galería 📸</h2>
                     <p class="text-xs text-gray-400 font-light flex items-center gap-2 mt-0.5">
-                        <span id="server-status-badge"
+                        <span id="server-status-badge-community"
                             class="px-2 py-0.5 rounded-full text-[10px] font-bold bg-amber-500/20 text-amber-400 border border-amber-500/30">Cargando
                             modo...</span>
                     </p>
@@ -573,9 +830,9 @@
                 class="text-gold-500"></span>!</h2>
         <p class="text-gray-300 font-light max-w-sm mx-auto mb-8">Tus respuestas y buenos deseos han quedado guardados.
             ¡Esperamos verte en la Celebración!</p>
-        <button onclick="nextScreen(2)"
-            class="px-8 py-3 bg-gradient-to-r from-gold-600 to-gold-400 text-black font-bold rounded-full hover:scale-105 transition-all">
-            VOLVER A VER INVITACIÓN
+        <button onclick="nextScreen(0)"
+            class="px-8 py-3 bg-gradient-to-r from-gold-600 to-gold-400 text-black font-bold rounded-full hover:scale-105 transition-all shadow-lg flex items-center gap-2 mx-auto">
+            <i class="ph ph-house-line text-lg"></i> IR AL MURAL DE LA FIESTA
         </button>
     </div>
 
@@ -656,14 +913,18 @@
         let guestRowId = null;
 
         function updateServerStatusUI() {
-            const badge = document.getElementById('server-status-badge');
-            if (!badge) return;
+            const badgeHub = document.getElementById('server-status-badge-hub');
+            const badgeCommunity = document.getElementById('server-status-badge-community');
             if (isOnline) {
-                badge.textContent = '☁️ Conectado en tiempo real';
-                badge.className = 'px-2 py-0.5 rounded-full text-[10px] font-bold bg-emerald-500/20 text-emerald-400 border border-emerald-500/30';
+                const text = '☁️ Conectado en tiempo real';
+                const className = 'px-2 py-0.5 rounded-full text-[10px] font-bold bg-emerald-500/20 text-emerald-400 border border-emerald-500/30';
+                if (badgeHub) { badgeHub.textContent = text; badgeHub.className = className; }
+                if (badgeCommunity) { badgeCommunity.textContent = text; badgeCommunity.className = className; }
             } else {
-                badge.textContent = '⚠️ Sin conexión, reintentando...';
-                badge.className = 'px-2 py-0.5 rounded-full text-[10px] font-bold bg-red-500/20 text-red-400 border border-red-500/30';
+                const text = '⚠️ Sin conexión, reintentando...';
+                const className = 'px-2 py-0.5 rounded-full text-[10px] font-bold bg-red-500/20 text-red-400 border border-red-500/30';
+                if (badgeHub) { badgeHub.textContent = text; badgeHub.className = className; }
+                if (badgeCommunity) { badgeCommunity.textContent = text; badgeCommunity.className = className; }
             }
         }
 
@@ -760,35 +1021,176 @@
                     }
                 } catch (e) { }
             }
-
-            const retBox = document.getElementById('returning-guest-box');
-            const retName = document.getElementById('returning-guest-name');
-            const btnShort = document.getElementById('btn-returning-short');
-            if (retBox && retName && btnShort) {
-                retName.textContent = savedName;
-                btnShort.textContent = savedName.split(' ')[0];
-                retBox.classList.remove('hidden');
-            }
+            updateGuestNameDisplay();
         }
 
-        window.continueAsReturningGuest = () => {
-            const name = localStorage.getItem('danitza_guest_name');
-            if (name) {
+        // Sincronizar nombre de invitado en los diferentes elementos del Hub
+        function updateGuestNameDisplay() {
+            const name = localStorage.getItem('danitza_guest_name') || window.guestData.name || '';
+            const hubUserName = document.getElementById('hub-user-name');
+            const hubInlineAuthor = document.getElementById('hub-inline-author');
+            const modalMsgName = document.getElementById('modal-msg-name');
+
+            if (hubUserName) hubUserName.textContent = name ? name : 'Invitado';
+            if (hubInlineAuthor) hubInlineAuthor.textContent = name ? name : 'Invitado';
+            if (modalMsgName && name) modalMsgName.value = name;
+        }
+        window.updateGuestNameDisplay = updateGuestNameDisplay;
+
+        // Notificación Toast Flotante
+        window.showToast = (msg, icon = '✨') => {
+            const toast = document.getElementById('toast-notification');
+            const text = document.getElementById('toast-text');
+            const ico = document.getElementById('toast-icon');
+            if (!toast) return;
+            if (text) text.textContent = msg;
+            if (ico) ico.textContent = icon;
+            toast.classList.remove('-translate-y-24', 'opacity-0');
+            toast.classList.add('translate-y-0', 'opacity-100');
+            clearTimeout(window._toastTimeout);
+            window._toastTimeout = setTimeout(() => {
+                toast.classList.remove('translate-y-0', 'opacity-100');
+                toast.classList.add('-translate-y-24', 'opacity-0');
+            }, 3600);
+        };
+
+        // Visor de Fotos en Pantalla Completa (Lightbox)
+        window.openLightbox = (url, author) => {
+            const box = document.getElementById('photo-lightbox');
+            const img = document.getElementById('lightbox-img');
+            const cap = document.getElementById('lightbox-caption');
+            if (!box || !img) return;
+            img.src = url;
+            if (cap) cap.textContent = `📷 Foto compartida por ${author || 'Invitado'}`;
+            box.classList.remove('hidden');
+            document.body.style.overflow = 'hidden';
+        };
+        window.closeLightbox = () => {
+            const box = document.getElementById('photo-lightbox');
+            if (box) box.classList.add('hidden');
+            document.body.style.overflow = '';
+        };
+
+        // Modal de Dedicatoria Rápida
+        window.openQuickMsgModal = () => {
+            const modal = document.getElementById('quick-msg-modal');
+            const nameInput = document.getElementById('modal-msg-name');
+            const savedName = localStorage.getItem('danitza_guest_name') || window.guestData.name || '';
+            if (nameInput && savedName) nameInput.value = savedName;
+            if (modal) modal.classList.remove('hidden');
+        };
+        window.closeQuickMsgModal = () => {
+            const modal = document.getElementById('quick-msg-modal');
+            if (modal) modal.classList.add('hidden');
+        };
+
+        // Modal de Identificación de Nombre
+        window.pendingActionAfterName = null;
+        window.openNamePrompt = () => {
+            const modal = document.getElementById('name-prompt-modal');
+            const input = document.getElementById('quick-name-input');
+            const savedName = localStorage.getItem('danitza_guest_name') || window.guestData.name || '';
+            if (input) input.value = savedName;
+            if (modal) modal.classList.remove('hidden');
+            if (input) setTimeout(() => input.focus(), 100);
+        };
+        window.closeNamePrompt = () => {
+            const modal = document.getElementById('name-prompt-modal');
+            if (modal) modal.classList.add('hidden');
+        };
+        window.saveQuickName = (withValue) => {
+            const input = document.getElementById('quick-name-input');
+            const name = withValue && input ? input.value.trim() : '';
+            if (name.length > 0) {
                 window.guestData.name = name;
-                document.getElementById('guest-greeting').textContent = `¡HOLA ${name.toUpperCase()}, ESTÁS INVITAD@!`;
-                nextScreen(2);
+                localStorage.setItem('danitza_guest_name', name);
+                saveGuestToDB();
+                showToast(`¡Hola ${name}! Registrado con éxito`, '👋');
+            }
+            updateGuestNameDisplay();
+            closeNamePrompt();
+
+            if (window.pendingActionAfterName === 'upload') {
+                window.pendingActionAfterName = null;
+                setTimeout(() => {
+                    const fi = document.getElementById('file-upload');
+                    if (fi) fi.click();
+                }, 300);
             }
         };
 
-        window.resetGuestSession = () => {
-            localStorage.removeItem('danitza_guest_name');
-            localStorage.removeItem('danitza_device_id');
-            localStorage.removeItem('danitza_guest_cache');
-            localStorage.removeItem('danitza_trivia_completed');
-            localStorage.removeItem('danitza_saved_score');
-            window.guestData = { name: '', status: null, companions: 0, score: undefined, message: '' };
-            document.getElementById('guest-name-input').value = '';
-            document.getElementById('returning-guest-box').classList.add('hidden');
+        // Disparador directo para subir fotos
+        window.triggerPhotoUpload = () => {
+            const savedName = localStorage.getItem('danitza_guest_name');
+            if (!savedName) {
+                window.pendingActionAfterName = 'upload';
+                openNamePrompt();
+                return;
+            }
+            const fi = document.getElementById('file-upload');
+            if (fi) fi.click();
+        };
+
+        // Enviar Dedicatoria desde el Modal
+        window.submitModalMessage = async () => {
+            const nameInput = document.getElementById('modal-msg-name');
+            const textInput = document.getElementById('modal-msg-text');
+            const name = nameInput ? nameInput.value.trim() : '';
+            const text = textInput ? textInput.value.trim() : '';
+
+            if (!text) {
+                showToast('Por favor escribe unas palabras para Danitza 💌', '✍️');
+                return;
+            }
+            if (name) {
+                window.guestData.name = name;
+                localStorage.setItem('danitza_guest_name', name);
+                updateGuestNameDisplay();
+            }
+            window.guestData.message = text;
+            await saveGuestToDB();
+            closeQuickMsgModal();
+            if (textInput) textInput.value = '';
+            showToast('¡Tu dedicatoria fue publicada en el mural! ❤️', '🎉');
+            fetchAndRenderGuests();
+        };
+
+        // Enviar Dedicatoria Inline en el Hub
+        window.submitInlineMessage = async () => {
+            const input = document.getElementById('hub-inline-message');
+            const text = input ? input.value.trim() : '';
+            if (!text) {
+                showToast('Escribe tu mensaje para Danitza antes de publicar', '✍️');
+                return;
+            }
+            const savedName = localStorage.getItem('danitza_guest_name');
+            if (!savedName) {
+                openNamePrompt();
+                return;
+            }
+            window.guestData.message = text;
+            await saveGuestToDB();
+            if (input) input.value = '';
+            showToast('¡Tu dedicatoria fue publicada en el mural! ❤️', '🎉');
+            fetchAndRenderGuests();
+        };
+
+        // Pestañas del Hub (Fotos vs Mensajes)
+        window.switchHubTab = (tabId) => {
+            document.querySelectorAll('.hub-tab-content').forEach(el => el.classList.add('hidden'));
+            const target = document.getElementById(tabId);
+            if (target) target.classList.remove('hidden');
+
+            const btnPhotos = document.getElementById('btn-tab-hub-photos');
+            const btnMessages = document.getElementById('btn-tab-hub-messages');
+
+            if (tabId === 'tab-hub-photos') {
+                if (btnPhotos) btnPhotos.className = 'hub-tab-btn flex-1 py-2.5 px-3 rounded-xl font-bold text-xs sm:text-sm bg-gradient-to-r from-gold-600 to-gold-400 text-black shadow-lg transition-all flex items-center justify-center gap-1.5';
+                if (btnMessages) btnMessages.className = 'hub-tab-btn flex-1 py-2.5 px-3 rounded-xl font-bold text-xs sm:text-sm glass-panel text-gray-300 border border-white/10 hover:text-white transition-all flex items-center justify-center gap-1.5';
+            } else {
+                if (btnMessages) btnMessages.className = 'hub-tab-btn flex-1 py-2.5 px-3 rounded-xl font-bold text-xs sm:text-sm bg-gradient-to-r from-gold-600 to-gold-400 text-black shadow-lg transition-all flex items-center justify-center gap-1.5';
+                if (btnPhotos) btnPhotos.className = 'hub-tab-btn flex-1 py-2.5 px-3 rounded-xl font-bold text-xs sm:text-sm glass-panel text-gray-300 border border-white/10 hover:text-white transition-all flex items-center justify-center gap-1.5';
+            }
         };
 
         window.exitApp = () => {
@@ -805,22 +1207,20 @@
         audioBtn.addEventListener('click', () => {
             if (isAudioPlaying) {
                 bgMusic.pause();
-                audioIcon.classList.replace('ph-speaker-high', 'ph-speaker-slash');
+                audioIcon.classList.replace('ph-speaker-simple-high', 'ph-speaker-slash');
                 audioIcon.classList.add('opacity-50', 'text-white');
-                audioIcon.classList.remove('text-gold-500');
+                audioIcon.classList.remove('text-gold-500', 'animate-pulse');
             } else {
                 bgMusic.play().catch(e => console.log("Autoplay bloqueado"));
-                audioIcon.classList.replace('ph-speaker-slash', 'ph-speaker-high');
+                audioIcon.classList.replace('ph-speaker-slash', 'ph-speaker-simple-high');
                 audioIcon.classList.remove('opacity-50', 'text-white');
-                audioIcon.classList.add('text-gold-500');
+                audioIcon.classList.add('text-gold-500', 'animate-pulse');
             }
             isAudioPlaying = !isAudioPlaying;
         });
 
         window.goBack = () => {
-            if (window.currentScreen > 0) {
-                nextScreen(window.currentScreen - 1);
-            }
+            nextScreen(0);
         };
 
         window.nextScreen = (num) => {
@@ -831,7 +1231,7 @@
             window.scrollTo(0, 0);
 
             const backBtn = document.getElementById('back-btn');
-            if (num > 0 && num < 7 && num !== 5) {
+            if (num > 0 && num !== 9) {
                 backBtn.classList.remove('hidden');
             } else {
                 backBtn.classList.add('hidden');
@@ -839,37 +1239,25 @@
 
             const quickNav = document.getElementById('quick-nav');
             if (quickNav) {
-                if (num >= 2 && num !== 8 && num !== 9) {
+                if (num !== 9) {
                     quickNav.classList.remove('hidden');
                 } else {
                     quickNav.classList.add('hidden');
                 }
             }
 
+            if (num === 0) {
+                loadPhotos();
+                loadCommunityData();
+                updateGuestNameDisplay();
+            }
             if (num === 2) {
-                audioBtn.classList.remove('hidden');
                 if (!isAudioPlaying) audioBtn.click();
             }
             if (num === 3) startTrivia();
             if (num === 4) initCountdown();
             if (num === 7) loadPhotos();
             if (num === 8) loadCommunityData();
-        };
-
-        window.registerName = () => {
-            const input = document.getElementById('guest-name-input');
-            const name = input ? input.value.trim() : '';
-            if (name.length < 2) {
-                document.getElementById('name-error').classList.remove('hidden');
-                return;
-            }
-            window.guestData.name = name;
-            localStorage.setItem('danitza_guest_name', name);
-
-            document.getElementById('guest-greeting').textContent = `¡HOLA ${name.toUpperCase()}, ESTÁS INVITAD@!`;
-            nextScreen(1);
-
-            saveGuestToDB();
         };
 
         let currentQuestionIndex = 0;
@@ -1096,57 +1484,52 @@
         function renderDataFromGuests(guests) {
             const messagesList = document.getElementById('community-messages-list');
             const leaderboardList = document.getElementById('trivia-leaderboard-list');
-            const guestsList = document.getElementById('admin-guest-list');
+            const hubMessagesList = document.getElementById('hub-messages-list');
+            const hubMessagesCount = document.getElementById('hub-messages-count');
 
             if (messagesList) messagesList.innerHTML = '';
             if (leaderboardList) leaderboardList.innerHTML = '';
-            if (guestsList) guestsList.innerHTML = '';
-
-            let countYes = 0;
-            let countNo = 0;
-            let totalPeople = 0;
-            let totalScore = 0;
-            let scoreCount = 0;
+            if (hubMessagesList) hubMessagesList.innerHTML = '';
 
             if (!guests || guests.length === 0) {
                 if (messagesList) messagesList.innerHTML = '<p class="text-gray-500 text-center col-span-2 py-6">Aún no hay mensajes en el muro.</p>';
                 if (leaderboardList) leaderboardList.innerHTML = '<p class="text-gray-500 text-center py-6">Aún nadie ha respondido la trivia.</p>';
-                if (guestsList) guestsList.innerHTML = '<p class="text-gray-500 text-center col-span-2 py-6">No hay invitados registrados aún.</p>';
+                if (hubMessagesList) hubMessagesList.innerHTML = '<p class="text-gray-400 italic text-center py-8 col-span-2">Aún no hay dedicatorias escritas. ¡Sé el primero en dejarle una a Danitza!</p>';
+                if (hubMessagesCount) hubMessagesCount.textContent = '0';
                 return;
             }
 
-            guests.forEach(data => {
-                const status = data.status || 'PENDING';
-                const comps = parseInt(data.companions || 0);
-
-                if (status === 'YES') {
-                    countYes++;
-                    totalPeople += (1 + comps);
-                } else if (status === 'NO') {
-                    countNo++;
-                }
-
-                if (data.score !== undefined && data.score !== null) {
-                    totalScore += parseInt(data.score);
-                    scoreCount++;
-                }
-            });
-
-            const elStatYes = document.getElementById('stat-yes');
-            const elStatNo = document.getElementById('stat-no');
-            const elStatTotal = document.getElementById('stat-total');
-            const elStatAvg = document.getElementById('stat-trivia-avg');
-
-            if (elStatYes) elStatYes.textContent = countYes;
-            if (elStatNo) elStatNo.textContent = countNo;
-            if (elStatTotal) elStatTotal.textContent = totalPeople;
-            if (elStatAvg) elStatAvg.textContent = scoreCount > 0 ? (totalScore / scoreCount).toFixed(1) + '/10' : '-';
-
             const messages = guests.filter(g => g.message && g.message.trim() !== '');
+            if (hubMessagesCount) hubMessagesCount.textContent = messages.length;
+
+            // Renderizar dedicatorias en el Hub Principal
+            if (hubMessagesList) {
+                if (messages.length === 0) {
+                    hubMessagesList.innerHTML = '<p class="text-gray-400 italic text-center py-8 col-span-2">Aún no hay dedicatorias escritas. ¡Sé el primero en dejarle una hermosa felicitación a Danitza!</p>';
+                } else {
+                    hubMessagesList.innerHTML = '';
+                    messages.forEach(g => {
+                        const author = g.name && g.name.trim() ? g.name : 'Invitado especial';
+                        hubMessagesList.innerHTML += `
+                            <div class="glass-panel p-5 rounded-2xl border border-gold-500/30 relative overflow-hidden group hover:border-gold-500/70 transition-all shadow-xl bg-black/45">
+                                <div class="absolute -right-2 -bottom-2 text-gold-500/10 text-6xl font-serif select-none pointer-events-none">"</div>
+                                <p class="text-white text-sm sm:text-base leading-relaxed font-light mb-4 italic">"${g.message}"</p>
+                                <div class="flex items-center justify-between text-xs pt-3 border-t border-white/10">
+                                    <span class="font-bold text-gold-400 flex items-center gap-1.5"><i class="ph ph-heart-fill text-red-500"></i> ${author}</span>
+                                    ${g.status === 'YES' ? '<span class="text-emerald-400 font-medium text-[10px] bg-emerald-500/10 px-2.5 py-0.5 rounded-full border border-emerald-500/20">En la fiesta 🎉</span>' : ''}
+                                </div>
+                            </div>
+                        `;
+                    });
+                }
+            }
+
+            // Renderizar dedicatorias en la pantalla 8 (Comunidad)
             if (messagesList) {
                 if (messages.length === 0) {
                     messagesList.innerHTML = '<p class="text-gray-500 text-center col-span-2 py-6">Aún no hay mensajes en el muro. ¡Sé el primero en dejarle uno a Danitza!</p>';
                 } else {
+                    messagesList.innerHTML = '';
                     messages.forEach(g => {
                         messagesList.innerHTML += `
                             <div class="glass-panel p-5 rounded-2xl border border-gold-500/30 relative overflow-hidden group hover:border-gold-500/60 transition-all shadow-lg">
@@ -1167,6 +1550,7 @@
                 if (triviaPlayers.length === 0) {
                     leaderboardList.innerHTML = '<p class="text-gray-500 text-center py-6">Nadie ha jugado la trivia aún.</p>';
                 } else {
+                    leaderboardList.innerHTML = '';
                     triviaPlayers.forEach((g, index) => {
                         let badge = `<span class="w-7 h-7 rounded-full bg-white/10 flex items-center justify-center text-xs text-gray-300 font-bold">${index + 1}</span>`;
                         if (index === 0) badge = '<span class="text-2xl">👑</span>';
@@ -1190,24 +1574,6 @@
                         `;
                     });
                 }
-            }
-
-            if (guestsList) {
-                guests.forEach(g => {
-                    let statusColor = g.status === 'YES' ? 'text-emerald-400' : (g.status === 'NO' ? 'text-red-400' : 'text-gray-400');
-                    let statusText = g.status === 'YES' ? 'Confirmado' : (g.status === 'NO' ? 'No asiste' : 'Pendiente');
-
-                    guestsList.innerHTML += `
-                        <div class="glass-panel p-4 rounded-xl border border-white/10">
-                            <h3 class="font-bold text-white text-base">${g.name}</h3>
-                            <div class="flex justify-between items-center mt-2 text-xs">
-                                <span class="${statusColor} font-medium">${statusText}</span>
-                                <span class="text-gray-400">Trivia: <span class="text-gold-500">${g.score !== undefined && g.score !== null ? g.score : '-'}/10</span></span>
-                            </div>
-                            ${g.status === 'YES' && g.companions > 0 ? `<p class="text-[11px] text-gray-400 mt-1">+${g.companions} acompañante(s)</p>` : ''}
-                        </div>
-                    `;
-                });
             }
         }
 
@@ -1244,7 +1610,37 @@
         function renderPhotoGrid(photos) {
             const grid = document.getElementById('photo-grid');
             const communityGrid = document.getElementById('community-photo-grid');
+            const hubGrid = document.getElementById('hub-photo-grid');
+            const hubCount = document.getElementById('hub-photos-count');
 
+            if (hubCount) hubCount.textContent = photos ? photos.length : 0;
+
+            // Renderizar en el Mural del Hub Principal
+            if (hubGrid) {
+                hubGrid.innerHTML = '';
+                if (!photos || photos.length === 0) {
+                    hubGrid.innerHTML = '<p class="text-gray-400 italic text-center py-10 col-span-full">Aún no hay fotos en el mural. ¡Toma la primera foto con Danitza y súbela! 📸</p>';
+                } else {
+                    photos.forEach(photo => {
+                        const div = document.createElement('div');
+                        const author = photo.uploaded_by || 'Invitado';
+                        div.className = "break-inside-avoid overflow-hidden rounded-2xl border border-white/15 glass-panel mb-3.5 group relative cursor-pointer hover:border-gold-400 transition-all duration-300 shadow-lg";
+                        div.onclick = () => openLightbox(photo.url, author);
+                        div.innerHTML = `
+                            <div class="relative overflow-hidden">
+                                <img src="${photo.url}" loading="lazy" class="w-full h-auto object-cover group-hover:scale-105 transition-transform duration-500" alt="Foto de la Celebración"/>
+                                <div class="absolute inset-x-0 bottom-0 bg-gradient-to-t from-black/85 via-black/40 to-transparent p-2.5 flex items-center justify-between text-[11px] text-gold-300 font-medium">
+                                    <span class="truncate max-w-[80%]">📷 ${author}</span>
+                                    <i class="ph ph-magnifying-glass-plus text-base text-gold-400"></i>
+                                </div>
+                            </div>
+                        `;
+                        hubGrid.appendChild(div);
+                    });
+                }
+            }
+
+            // Renderizar en pantalla 7
             if (grid) {
                 grid.innerHTML = '';
                 const noPhotosMsg = document.getElementById('no-photos-msg');
@@ -1254,14 +1650,17 @@
                     if (noPhotosMsg) noPhotosMsg.classList.add('hidden');
                     photos.forEach(photo => {
                         const div = document.createElement('div');
-                        div.className = "break-inside-avoid overflow-hidden rounded-xl border border-white/10 glass-panel mb-4";
-                        div.innerHTML = `<img src="${photo.url}" loading="lazy" class="w-full h-auto object-cover hover:scale-105 transition-transform duration-500 cursor-pointer" alt="Foto de la Celebración"/>
-                                         <div class="p-2 text-[10px] text-gray-500 text-right">Subida por ${photo.uploaded_by || 'Invitado'}</div>`;
+                        const author = photo.uploaded_by || 'Invitado';
+                        div.className = "break-inside-avoid overflow-hidden rounded-xl border border-white/10 glass-panel mb-4 cursor-pointer";
+                        div.onclick = () => openLightbox(photo.url, author);
+                        div.innerHTML = `<img src="${photo.url}" loading="lazy" class="w-full h-auto object-cover hover:scale-105 transition-transform duration-500" alt="Foto de la Celebración"/>
+                                         <div class="p-2 text-[10px] text-gray-400 text-right">Subida por ${author}</div>`;
                         grid.appendChild(div);
                     });
                 }
             }
 
+            // Renderizar en pantalla 8
             if (communityGrid) {
                 communityGrid.innerHTML = '';
                 if (!photos || photos.length === 0) {
@@ -1269,11 +1668,13 @@
                 } else {
                     photos.forEach(photo => {
                         const div = document.createElement('div');
-                        div.className = "overflow-hidden rounded-xl border border-white/10 glass-panel group relative";
+                        const author = photo.uploaded_by || 'Invitado';
+                        div.className = "overflow-hidden rounded-xl border border-white/10 glass-panel group relative cursor-pointer";
+                        div.onclick = () => openLightbox(photo.url, author);
                         div.innerHTML = `
                             <img src="${photo.url}" loading="lazy" class="w-full h-44 object-cover hover:scale-110 transition-transform duration-500" alt="Foto de la Celebración"/>
                             <div class="absolute inset-x-0 bottom-0 bg-gradient-to-t from-black/80 to-transparent p-2 text-[11px] text-gold-300 font-medium truncate">
-                                📷 ${photo.uploaded_by || 'Invitado'}
+                                📷 ${author}
                             </div>
                         `;
                         communityGrid.appendChild(div);
@@ -1284,7 +1685,7 @@
 
         async function fetchAndRenderPhotos() {
             try {
-                const { data, error } = await supabase.from('photos').select('*').order('created_at', { ascending: false }).limit(60);
+                const { data, error } = await supabase.from('photos').select('*').order('created_at', { ascending: false }).limit(80);
                 if (error) throw error;
                 renderPhotoGrid(data || []);
             } catch (err) {
@@ -1299,13 +1700,12 @@
             if (photosChannel) supabase.removeChannel(photosChannel);
             photosChannel = supabase
                 .channel('photos-realtime')
-                .on('postgres_changes', { event: 'INSERT', schema: 'public', table: 'photos' }, () => fetchAndRenderPhotos())
+                .on('postgres_changes', { event: '*', schema: 'public', table: 'photos' }, () => fetchAndRenderPhotos())
                 .subscribe();
         }
         window.loadPhotos = loadPhotos;
 
         // Redimensiona la imagen en el navegador y la entrega como Blob JPEG liviano
-        // (antes esta función se invocaba pero nunca existía en el archivo original: la subida de fotos estaba rota)
         function resizeImageToBlob(file, maxWidth, quality, callback) {
             const img = new Image();
             const reader = new FileReader();
@@ -1326,10 +1726,23 @@
             const file = event.target.files[0];
             if (!file) return;
 
+            showToast('Subiendo foto al mural de Danitza...', '⏳');
+
             const btn = document.getElementById('upload-btn');
-            const originalContent = btn.innerHTML;
-            btn.innerHTML = '<i class="ph ph-spinner-gap animate-spin text-xl"></i> SUBIENDO...';
-            btn.disabled = true;
+            const hubBtn = document.getElementById('hub-upload-btn');
+            const originalHub = hubBtn ? hubBtn.dataset.originalHtml : '';
+            if (hubBtn) {
+                hubBtn.innerHTML = `
+                    <div class="w-11 h-11 rounded-full bg-black/20 flex items-center justify-center text-black text-2xl animate-spin">
+                        <i class="ph ph-spinner-gap"></i>
+                    </div>
+                    <div class="text-left">
+                        <span class="block text-sm sm:text-base font-black tracking-wide">SUBIENDO FOTO...</span>
+                        <span class="block text-[11px] font-medium opacity-85">Espera unos segundos</span>
+                    </div>
+                `;
+            }
+            if (btn) btn.disabled = true;
 
             resizeImageToBlob(file, 1600, 0.85, async (blob) => {
                 try {
@@ -1339,30 +1752,74 @@
 
                     const { data: urlData } = supabase.storage.from(PHOTOS_BUCKET).getPublicUrl(path);
 
+                    const authorName = localStorage.getItem('danitza_guest_name') || window.guestData.name || 'Invitado';
+
                     const { error: insertError } = await supabase.from('photos').insert({
                         url: urlData.publicUrl,
                         storage_path: path,
-                        uploaded_by: window.guestData.name || 'Invitado'
+                        uploaded_by: authorName
                     });
                     if (insertError) throw insertError;
 
-                    btn.innerHTML = '<i class="ph ph-check text-xl"></i> ¡FOTO SUBIDA!';
+                    showToast('¡Foto agregada al mural con éxito! 📸', '🎉');
                 } catch (err) {
                     console.error('Error subiendo foto:', err);
-                    btn.innerHTML = '<i class="ph ph-warning text-xl"></i> ERROR, INTENTA DE NUEVO';
+                    showToast('Error al subir la foto, intenta nuevamente', '⚠️');
                 } finally {
+                    if (hubBtn && originalHub) hubBtn.innerHTML = originalHub;
+                    if (btn) btn.disabled = false;
+                    event.target.value = '';
                     setTimeout(() => {
-                        btn.innerHTML = originalContent;
-                        btn.disabled = false;
                         fetchAndRenderPhotos();
-                    }, 1400);
+                    }, 500);
                 }
             });
         };
 
+        function launchConfetti() {
+            if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
+            const canvas = document.getElementById('particles-canvas');
+            if (!canvas) return;
+            const ctx = canvas.getContext('2d');
+            const w = canvas.width = window.innerWidth;
+            const h = canvas.height = window.innerHeight;
+            const pieces = Array.from({ length: 120 }, () => ({
+                x: w / 2,
+                y: h / 2,
+                r: Math.random() * 6 + 4,
+                color: ['#DEB753', '#C9992F', '#F8ECC9', '#E9CE86', '#FFF'][Math.floor(Math.random() * 5)],
+                angle: Math.random() * Math.PI * 2,
+                speed: Math.random() * 12 + 6,
+                gravity: 0.25,
+                tilt: Math.random() * 10 - 5,
+                tiltSpeed: Math.random() * 0.3 - 0.15
+            }));
+            let frame = 0;
+            function burst() {
+                ctx.clearRect(0, 0, w, h);
+                pieces.forEach(p => {
+                    p.x += Math.cos(p.angle) * p.speed;
+                    p.y += Math.sin(p.angle) * p.speed + p.gravity;
+                    p.speed *= 0.99;
+                    p.tilt += p.tiltSpeed;
+                    ctx.beginPath();
+                    ctx.fillStyle = p.color;
+                    ctx.ellipse(p.x, p.y, p.r, p.r * 0.6, p.tilt, 0, Math.PI * 2);
+                    ctx.fill();
+                });
+                frame++;
+                if (frame < 100) requestAnimationFrame(burst);
+            }
+            burst();
+        }
+
         window.addEventListener('DOMContentLoaded', () => {
             updateServerStatusUI();
             checkLocalSession();
+            updateGuestNameDisplay();
+            loadPhotos();
+            loadCommunityData();
+            setTimeout(launchConfetti, 600);
         });
     </script>
 </body>
